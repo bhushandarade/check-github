@@ -27,7 +27,6 @@ jobs:
       - name: Get latest tag
         id: git_version
         run: |
-          # Get the latest tag version
           git fetch --tags
           echo "Latest tag: $(git describe --tags --abbrev=0)" 
           echo "LATEST_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
@@ -54,7 +53,7 @@ jobs:
           tag_prefix: "v"
           version_type: ${{ env.version_type }}
           branch: main
-          dry_run: false
+          dry_run: false # Ensure this is 'false' to actually create the tag
           release_description: "Automated release versioning based on commit messages"
 
       - name: Push changes
