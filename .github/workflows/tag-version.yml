@@ -1,15 +1,21 @@
-
 name: Tag Version
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: write
 
 jobs:
   tag:
     name: Create Tag
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true # Only run on merged PRs
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -18,6 +24,14 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+
+      - name: Get latest tag
+        id: git_version
+        run: |
+          # Get the latest tag version
+          git fetch --tags
+          echo "Latest tag: $(git describe --tags --abbrev=0)" 
+          echo "LATEST_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
       - name: Determine version type
         id: version_type
