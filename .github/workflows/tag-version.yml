@@ -1,0 +1,50 @@
+
+name: Tag Version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    name: Create Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Determine version type
+        id: version_type
+        run: |
+          # Default to patch update
+          echo "version_type=patch" >> $GITHUB_ENV
+          
+          # Check commit messages for 'BREAKING CHANGE', 'feat:', or 'fix:'
+          if git log -1 --pretty=%B | grep -q "BREAKING CHANGE"; then
+            echo "version_type=major" >> $GITHUB_ENV
+          elif git log -1 --pretty=%B | grep -q "feat:"; then
+            echo "version_type=minor" >> $GITHUB_ENV
+          elif git log -1 --pretty=%B | grep -q "fix:"; then
+            echo "version_type=patch" >> $GITHUB_ENV
+          fi
+
+      - name: Create tag version
+        id: tag_version
+        uses: hennejg/github-tag-action@v4.3.1
+        with:
+          tag_prefix: "v"
+          version_type: ${{ env.version_type }}
+          branch: main
+          dry_run: false
+          release_description: "Automated release versioning based on commit messages"
+
+      - name: Push changes
+        if: steps.tag_version.outputs.new_tag == 'true'
+        run: |
+          git push origin --tags
