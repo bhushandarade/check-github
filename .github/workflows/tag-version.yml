@@ -15,7 +15,6 @@ jobs:
   tag:
     name: Create Tag
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true # Only run on merged PRs
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
