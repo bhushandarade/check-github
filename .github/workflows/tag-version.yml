@@ -33,10 +33,7 @@ jobs:
       - name: Determine version type
         id: version_type
         run: |
-          # Default to patch update
           VERSION_TYPE="patch"
-          
-          # Get the latest commit message
           COMMIT_MSG=$(git log -1 --pretty=%B)
 
           # Prioritize major change detection
@@ -48,14 +45,14 @@ jobs:
             VERSION_TYPE="patch"
           fi
 
-          echo "version_type=$VERSION_TYPE" >> $GITHUB_ENV
+          echo "VERSION_TYPE=$VERSION_TYPE" >> $GITHUB_ENV
 
-
-      # Step 4: Create a new tag using the GitHub Tag Action
+      # Step 4: Use GitHub Tag Action with correct inputs
       - name: Create Tag Version
         uses: hennejg/github-tag-action@v4.3.1
         with:
           tag_prefix: "v"
-          version_type: ${{ env.version_type }}
+          default_bump: ${{ env.VERSION_TYPE }}
+          release_branches: "main"
           dry_run: false
-          release_description: "Automated versioning based on commit messages"
+          create_annotated_tag: true
