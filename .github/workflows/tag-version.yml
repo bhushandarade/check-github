@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Fetch all history and tags
+          fetch-depth: 0
 
       # Step 2: Setup Git
       - name: Setup Git
@@ -39,8 +39,8 @@ jobs:
           # Get the latest commit message
           COMMIT_MSG=$(git log -1 --pretty=%B)
 
-          # Check the commit message for version type indicators
-          if echo "$COMMIT_MSG" | grep -qi "BREAKING CHANGE" || echo "$COMMIT_MSG" | grep -qi "major change"; then
+          # Prioritize major change detection
+          if echo "$COMMIT_MSG" | grep -qi "breaking change" || echo "$COMMIT_MSG" | grep -qi "major change"; then
             VERSION_TYPE="major"
           elif echo "$COMMIT_MSG" | grep -qi "new feature" || echo "$COMMIT_MSG" | grep -qi "enhancement"; then
             VERSION_TYPE="minor"
